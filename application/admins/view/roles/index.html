@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>角色管理</title>
+	<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+	<script type="text/javascript" src="__STATIC__/plugins/layui/layui.js"></script>
+	<style type="text/css">
+		.header span{background: #009688;margin-left: 30px;padding: 10px;color: #fff}
+		.header div{border-bottom: 2px solid #009688; margin-top:9px;}
+		.header button{float:right;}
+		td{text-align: center;}
+	</style>
+</head>
+<body style="padding:10px;">
+	<div class="header">
+		<span>角色列表</span>
+		<button class="layui-btn layui-btn-sm" onclick="add()" >添加</button>
+		<div></div>
+	</div>
+	<table class="layui-table">
+		<thead>
+			<tr>
+				<th style="text-align:center;">ID</th>
+				<th style="text-align:center;">角色名称</th>
+				<th style="text-align:center;">操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{volist name="data.roles" id="vo"}
+			<tr>
+				<td>{$vo.gid}</td>
+				<td>{$vo.title}</td>
+				<td>
+				<input type="button" name="" class="layui-btn layui-btn-xs" onclick="add({$vo.gid})" value="编辑" />
+				<input type="button" name="" class="layui-btn layui-btn-danger layui-btn-xs" onclick="del({$vo.gid})" value="删除" />
+				</td>
+			</tr>
+			{/volist}
+		</tbody>
+	</table>
+	<script type="text/javascript">
+	layui.use(['layer'],function(){
+		layer = layui.layer;
+		$ = layui.jquery;
+	});
+	//添加编辑
+	function add(gid){
+		layer.open({
+			type: 2,
+			title: gid>0?'编辑角色':'添加角色',
+			shade: 0.3,
+			area: ['480px','500px'],
+			content: '/admins.php/admins/Roles/add?gid='+gid
+		})
+	}
+	//删除
+	function del(gid){
+		layer.confirm('确定要删除吗?',{
+			btn:['确定','取消']
+		},function(){
+			$.post('/admins.php/admins/Roles/delete',{'gid':gid},function(res){
+				if(res.code>0){
+					layer.alert(res.msg,{icon:2});
+				}else{
+					layer.msg(res.msg);
+					setTimeout(function(){
+						window.location.reload();
+					},1000);
+				}
+			},'json');
+		});
+	}
+	</script>
+</body>
+</html>

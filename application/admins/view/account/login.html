@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>后台管理系统</title>
+	<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+	<script type="text/javascript" src="__STATIC__/plugins/layui/layui.js"></script>
+</head>
+<body style="background:#1e9fff">
+	<div style="position:absolute; left:50%;top:50%;width:500px;margin-left:-250px;margin-top:-200px">
+		<div style="background:#fff;padding:20px;border-radius:4px;box-shadow:5px 5px 20px #444;">
+			<div class="layui-form">
+				<div class="layui-form-item" style="color:gray;">
+					<h2>后台管理系统</h2>
+					<hr/>
+					<div class="layui-form-item">
+						<label class="layui-form-label">用户名</label>
+						<div class="layui-input-block">
+							<input type="text" id="username" class="layui-input" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">密&nbsp;&nbsp;&nbsp;&nbsp;码</label>
+						<div class="layui-input-block">
+							<input type="password" id="password" class="layui-input" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">验证码</label>
+						<div class="layui-input-inline">
+							<input type="text" id="verifycode" class="layui-input" value="">
+						</div>
+						<img src="{:captcha_src()}" id="img" onclick="reloadImg()" />
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button class="layui-btn" onclick="dologin()" >登陆</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		//layui封装带有juqery方法
+		layui.use(['layer'],function(){
+			$ = layui.jquery;
+			layer = layui.layer;
+			//用户名控件获取焦点
+			$('#username').focus();
+			//回车可登陆
+			$('input').keydown(function(e){
+				if(e.keyCode == 13){
+					dologin();
+				}
+			});
+		});
+
+		//重新生成验证码
+		function reloadImg(){
+			$('#img').attr('src','{:captcha_src()}?rand'+Math.random());
+		}
+
+		//登陆
+		function dologin(){
+			var username = $.trim($('#username').val());
+			var pwd = $.trim($('#password').val());
+			var verifycode = $.trim($('#verifycode').val());
+			if(username == ''){
+				layer.alert('请输入用户名',{icon:2});
+				reloadImg();
+			}
+			else if(pwd == ''){
+				layer.alert('请输入密码',{icon:2});
+				reloadImg();
+			}
+			else if(verifycode == ''){
+				layer.alert('请输入验证码',{icon:2});
+				reloadImg();
+			}else{
+			$.post('/admins.php/admins/Account/dologin',{'username':username,'pwd':pwd,'verifycode':verifycode},function(res){
+					if(res.code>0){
+						reloadImg();
+						layer.alert(res.msg,{icon:2});
+					}else{
+						layer.msg(res.msg);
+						setTimeout(function(){
+							window.location.href = '/admins.php/admins/Home/index'
+						},1000);
+					}
+			},'json')
+			}
+		}
+	</script>
+</body>
+</html>

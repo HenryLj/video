@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+	<script type="text/javascript" src="__STATIC__/plugins/layui/layui.js"></script>
+</head>
+<body style="padding:10px;">
+	<form class="layui-form">
+	<input type="hidden" name="id" value="{$data.item.id}" />
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户名</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="username" value='{$data.item.username}' {$data.item.id>0?'readonly':''} />
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">角&nbsp;&nbsp;&nbsp;&nbsp;色</label>
+			<div class="layui-input-inline">
+				<select name="gid">
+					<option value="0"></option>
+					{volist name="data.groups" id="vo"}
+					<option value="{$vo.gid}" {$vo.gid==$data.item.gid?'selected':''}>{$vo.title}</option>			
+					{/volist}
+				</select>
+			</div>
+		</div>
+		
+		<div class="layui-form-item">
+			<label class="layui-form-label">密&nbsp;&nbsp;&nbsp;&nbsp;码</label>
+			<div class="layui-input-inline">
+				<input type="password" class="layui-input" name="pwd" >
+			</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">姓&nbsp;&nbsp;&nbsp;&nbsp;名</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" name="truename" value="{$data.item.truename}" >
+			</div>
+		</div>
+	
+		<div class="layui-form-item">
+			<label class="layui-form-label">状&nbsp;&nbsp;&nbsp;&nbsp;态</label>
+			<div class="layui-input-inline">
+				<input name="status" type="checkbox" lay-skin="primary" class="layui-input" title="禁用" value="1" {$data.item.status?'checked':'
+				'}>
+			</div>
+		</div>
+	
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<input type="button" class="layui-btn" onclick="save()" value="保存" />
+			</div>
+		</div>
+	</form>
+
+	<script type="text/javascript">
+		layui.use(['layer','form'],function(){
+			form = layui.form;
+			$ = layui.jquery;
+			layer = layui.layer;
+		});
+
+		//保存管理员
+		function save(){
+			var id = parseInt($('input[name="id"]').val());
+			var username = $.trim($('input[name="username"]').val());
+			var pwd = $.trim($('input[name="pwd"]').val());
+			var gid = $('select[name="gid"]').val();
+			var truename = $.trim($('input[name="truename"]').val());
+			if(username == ''){
+				layer.alert('请输入用户名',{icon:2});
+				return;
+			}
+			if(isNaN(id)&&pwd == ''){
+				layer.alert('请输入密码',{icon:2});
+				return;
+			}
+			if(gid == 0){
+				layer.alert('请选择角色',{icon:2});
+				return;
+			}
+			if(truename == ''){
+				layer.alert('请输入姓名',{icon:2});
+				return;
+			}
+			$.post("/admins.php/admins/Admin/save",$("form").serialize(),function(res){
+				if(res.code>0){
+					layer.alert(res.msg,{icon:2});
+				}else{
+					layer.msg(res.msg);
+					setTimeout(function(){parent.window.location.reload();},1000);
+				}
+			},'json');
+		}
+	</script>
+</body>
+</html>
