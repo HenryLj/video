@@ -46,4 +46,10 @@ class Account extends Controller{
 		session('admin',$admin);
 		exit(json_encode(array('code'=>0,'msg'=>'登陆成功')));
 	}
+
+	//退出登陆
+	public function logout(){
+		session('admin',null);
+		exit(json_encode(array('code'=>0,'msg'=>'退出登陆')));
+	}
 }

@@ -16,6 +16,7 @@ class BaseAdmin extends Controller
 			header('Location: /admins.php/admins/Account/login');
 			exit();
 		}
+		$this->assign('admin',$this->_admin);
 		//判断用户是否有权限
 		$this->db = new Sysdb;
 	}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>地区</title>
+	<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+	<script type="text/javascript" src="__STATIC__/plugins/layui/layui.js"></script>
+	<style type="text/css">
+		.header span{background: #009688;margin-left: 30px;padding: 10px;color:#ffffff;}
+		.header div{border-bottom: solid 2px #009688;margin-top: 8px;}
+	</style>
+</head>
+<body style="padding: 10px;">
+	<div class="header">
+		<span>地区标签</span>
+		<div></div>
+	</div>
+
+	<form class="layui-form">
+		<input type="hidden" name="flag" value="area">
+		<table class="layui-table">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>排序</th>
+					<th>标签名称</th>
+					<th>是否禁用</th>
+				</tr>
+			</thead>
+			<tbody>
+				{volist name="data" id="vo"}
+				<tr>
+					<td>{$vo.id}</td>
+					<td><input type="text" class="layui-input" name="ords[{$vo.id}]" value="{$vo.ord}"></td>
+					<td><input type="text" class="layui-input" name="titles[{$vo.id}]" value="{$vo.title}"></td>
+					<td><input type="checkbox" lay-skin="primary" name="status[{$vo.id}]" title="禁用" {$vo.status?'checked':''} value=1></td>
+				</tr>
+				{/volist}
+				<tr>
+					<td></td>
+					<td><input type="text" class="layui-input" name="ords[0]"></td>
+					<td><input type="text" class="layui-input" name="titles[0]"></td>
+					<td><input type="checkbox" lay-skin="primary" name="status[0]" title="禁用" value=1></td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+	<button class="layui-btn" onclick="save()">保存</button>
+	<script type="text/javascript">
+		layui.use(['layer','form'],function(){
+			$ = layui.jquery;
+			layer = layui.layer;
+			form = layui.form;
+		});
+
+		// 保存
+		function save(){
+			$.post('/admins.php/admins/labels/save',$('form').serialize(),function(res){
+				if(res.code>0){
+					layer.alert(res.msg,{'icon':2});
+				}else{
+					layer.msg(res.msg,{'icon':1});
+					setTimeout(function(){window.location.reload();},1000);
+				}
+			},'json');
+		}
+	</script>
+</body> 
+</html>

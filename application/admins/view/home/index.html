@@ -2,8 +2,8 @@
 <html>
 <head>
 	<title>管理中心</title>
-	<link rel="stylesheet" type="text/css" href="../../../static/plugins/layui/css/layui.css">
-	<script type="text/javascript" src="../../../static/plugins/layui/layui.js"></script>
+	<link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+	<script type="text/javascript" src="__STATIC__/plugins/layui/layui.js"></script>
 	<style type="text/css">
 		.header{width: 100%;height: 50px;line-height: 50px;background: #2e6da4;color: #fff;}
 		.title{margin-left: 20px;font-size: 20px;}
@@ -21,35 +21,27 @@
 <body>
 	<!-- header -->
 	<div class="header">
-		<span class="title">后台管理系统</span>
-		<span class="userinfo">admin【系统管理员】<span><a href="javascript:;">退出</a></span></span>
+		<span class="title"><span style="font-size:12px;">{$site.values}</span>-后台管理系统</span>
+		<span class="userinfo">{$admin.username}【{$role.title}】<span><a href="javascript:;" onclick="logout()">退出</a></span></span>
 	</div>
 	<!-- 菜单 -->
 	<div class="menu" id="menu">
 	<div class="layui-collapse" lay-accordion>
+		{volist name="menus" id="vo"}
 		<div class="layui-colla-item">
-		    <h2 class="layui-colla-title">管理员管理</h2>
-		    <div class="layui-colla-content layui-show">
+		    <h2 class="layui-colla-title">{$vo.title}</h2>
+		    <div class="layui-colla-content {$i==1? 'layui-show':''}">
+		    	<?php if(isset($vo['children']) && $vo['children']){?>
 		    	<ul class="layui-nav layui-nav-tree" lay-filter="test">
-				<!-- 侧边导航: <ul class="layui-nav layui-nav-tree layui-nav-side"> -->
-				  <li class="layui-nav-item"><a href="javascript:;" onclick="menuFire(this)" src="/admins.php/admins/Admin/index">管理员列表</a></li>
+				  {volist name="vo.children" id="cvo"}
+				  <li class="layui-nav-item"><a href="javascript:;" onclick="menuFire(this)" src="/admins.php/admins/{$cvo.controller}/{$cvo.method}">{$cvo.title}</a></li>
+				  {/volist}
 				</ul>
+				<?php }?>
 			</div>
 		  </div>
-		  <div class="layui-colla-item">
-		    <h2 class="layui-colla-title">权限管理</h2>
-		    <div class="layui-colla-content">
-				<ul class="layui-nav layui-nav-tree" lay-filter="test">
-				  <li class="layui-nav-item"><a href="javascript:;" onclick="menuFire(this)" src="/admins.php/admins/Menu/index">菜单管理</a></li>
-				  <li class="layui-nav-item"><a href="javascript:;" onclick="menuFire(this)" src="/admins.php/admins/Roles/index">角色管理</a></li>
-				</ul>
-		    </div>
-		  </div>
-		  <div class="layui-colla-item">
-		    <h2 class="layui-colla-title">系统设置</h2>
-		    <div class="layui-colla-content">内容区域</div>
-		  </div>
-		</div>
+		{/volist}
+	</div>
 	</div>
 	<!-- 主操作页面 -->
 	<div class="main">
@@ -57,9 +49,10 @@
 	</div>
 
 <script>
-	layui.use('element', function(){
+	layui.use(['layer','element'], function(){
 	  var element = layui.element;
 	  $ = layui.jquery;
+	  layer = layui.layer;
 	  resetMenuHeight();
 	});
 	//重新设置菜单容器高度
@@ -78,6 +71,21 @@
 		var src = $(obj).attr('src');
 		//设置iframe的src
 		$('iframe').attr('src',src);
+	}
+	//退出
+	function logout(){
+		layer.confirm('确定要退出吗？',{
+			btn: ['确定','取消']
+		},function(){
+			$.get('/admins.php/admins/Account/logout',function(res){
+				if(res.code>0){
+					layer.msg(res.msg,{icon:2});
+				}else{
+					layer.msg(res.msg,{icon:1});
+					setTimeout(function(){window.location.href='/admins.php/admins/Account/login';},1000);
+				}
+			},'json');
+		});
 	}
 </script>
 </body>
